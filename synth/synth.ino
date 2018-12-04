@@ -1,12 +1,8 @@
 #include <MozziGuts.h>
-#include <AudioDelay.h>
-#include <Sample.h>
 #include <mozzi_midi.h>
-#include <LowPassFilter.h>
 #include <Oscil.h> // oscillator template
+#include <Metronome.h>
 #include <tables/sin2048_int8.h> // wavetable holding a sin wave
-#include <RollingAverage.h>
-#include <ControlDelay.h>
 #include <SoftwareSerial.h>
 // MIDI OUT wire map
 // yellow and light brown: high c -> C
@@ -21,7 +17,14 @@
 
 // add a 2-way switch for choosing midi keyboard vs synth mode! 
 // Synth BUTTON/SWITCH mode map
-// A -> 
+// A -> increase oscillator frequency
+// B -> decrease oscillator frequency
+// C -> metronome hold 
+// D -> metronome delay increase
+// D#-> metronome delay decrease
+// E -> metronome bpm increase
+// F -> metronome bpm decrease
+// no settings for G or G# in synth mode
 int a = 2;
 int b = 3;
 int c = 4;
@@ -34,8 +37,12 @@ int gsharp = 10;
 
 int modeswitch = 11;
 int oscfreq = 440;
+int bpm = 60;
+int metrodelay = 800;
 SoftwareSerial midiSerial(2,3);
 Oscil <2048, AUDIO_RATE> aSin(SIN2048_DATA);
+Metronome kMetro(metrodelay);  
+
 
 void setup() {
   // put your setup code here, to run once:
@@ -56,6 +63,7 @@ midiSerial.begin(31250);
 #define CONTROL_RATE 128
 startMozzi(CONTROL_RATE);
 aSin.setFreq(oscfreq);
+kMetro.setBPM(bpm);
 }
  
 void loop() {
@@ -77,24 +85,31 @@ void loop() {
    aSin.setFreq(oscfreq + 100);
    oscfreq = oscfreq + 100;
   }
-  if (b_read == 1) { // descreate oscillator frequency
+  if (b_read == 1) { // decrease oscillator frequency
    aSin.setFreq(oscfreq - 100);
    oscfreq = oscfreq - 100;
   }
-  else {
-    
-  }
-  if (a_read == 1) {
-    
+  if (c_read == 1) { // metronome hold
+    kMetro.start();
   }
   else {
-    
+    kMetro.stop();
   }
-  if (a_read == 1) {
-    
+  if (d_read == 1) { // metronome increase delay
+    kMetro.set(metrodelay + 100);
+    metrodelay = (metrodelay + 100);
   }
-  else {
-    
+  if (dsharp_read == 1) { // metronome decrease delay
+    kMetro.set(metrodelay + 100);
+    metrodelay = (metrodelay + 100);
+  }
+  if (e_read == 1) { // metronome increase BPM
+    kMetro.setBPM(bpm + 5);
+    bpm = bpm + 5;   
+  }
+  if (f_read == 1) { // metronome decrease BPM
+    kMetro.setBPM(bpm - 5);
+    bpm = bpm - 5;   
   }
 //  if (audioTicks()%10000 != 0 ) {
 //    pauseMozzi();
