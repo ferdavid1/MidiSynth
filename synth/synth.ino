@@ -21,7 +21,7 @@
 
 // add a 2-way switch for choosing midi keyboard vs synth mode! 
 // Synth BUTTON/SWITCH mode map
-
+// A -> 
 int a = 2;
 int b = 3;
 int c = 4;
@@ -33,6 +33,9 @@ int g = 9;
 int gsharp = 10;
 
 int modeswitch = 11;
+int oscfreq = 440;
+SoftwareSerial midiSerial(2,3);
+Oscil <2048, AUDIO_RATE> aSin(SIN2048_DATA);
 
 void setup() {
   // put your setup code here, to run once:
@@ -48,26 +51,35 @@ pinMode(gsharp, INPUT);
 pinMode(modeswitch, INPUT);
 
 Serial.begin(9600);
+midiSerial.begin(31250);
 
+#define CONTROL_RATE 128
+startMozzi(CONTROL_RATE);
+aSin.setFreq(oscfreq);
 }
  
 void loop() {
   // put your main code here, to run repeatedly:
- bool a_read = digitalRead(a);
- bool b_read = digitalRead(b);
- bool c_read = digitalRead(c);
- bool d_read = digitalRead(d);
- bool dsharp_read = digitalRead(dsharp);
- bool e_read = digitalRead(e);
- bool f_read = digitalRead(f);
- bool g_read = digitalRead(g);
- bool gsharp_read = digitalRead(gsharp);
+ int a_read = digitalRead(a);
+ int b_read = digitalRead(b);
+ int c_read = digitalRead(c);
+ int d_read = digitalRead(d);
+ int dsharp_read = digitalRead(dsharp);
+ int e_read = digitalRead(e);
+ int f_read = digitalRead(f);
+ int g_read = digitalRead(g);
+ int gsharp_read = digitalRead(gsharp);
  int readlist[9] = {a_read, b_read, c_read, d_read, dsharp_read, e_read, f_read, g_read, gsharp_read};
-
- bool modeswitchread = digitalRead(modeswitch);
+ int midilist[9] = {33, 35, 24, 26, 27, 28, 29, 31, 32};
+ int modeswitchread = digitalRead(modeswitch);
  if (modeswitchread == 1) { // Synth Mode
-  if (a_read == 1) {
-    
+  if (a_read == 1) { // increase oscillator frequency
+   aSin.setFreq(oscfreq + 100);
+   oscfreq = oscfreq + 100;
+  }
+  if (b_read == 1) { // descreate oscillator frequency
+   aSin.setFreq(oscfreq - 100);
+   oscfreq = oscfreq - 100;
   }
   else {
     
@@ -84,20 +96,31 @@ void loop() {
   else {
     
   }
-  if (a_read == 1) {
-    
-  }
-  else {
-    
-  }
+//  if (audioTicks()%10000 != 0 ) {
+//    pauseMozzi();
+//    delay(1000);
+//    startMozzi();
+//  }
  }
  else { // MIDI Keyboard mode
-    for (i, i < 10, i++) in readlist {
-      if (i == 1) {
-        // that note to midi
+    for (int i = 0; i < 10; i++) {
+      if (readlist[i] == 1) {
+        // to midi
+        noteOn(0x90, midilist[i], 0x45);
     }
   }
-  
  }
-
+ audioHook();
+}
+ void updateControl(){
+  // has to be included
+ }
+ int updateAudio(){
+  return aSin.next();
+ }
+ void noteOn(byte cmd, byte data1, byte  data2) {
+   midiSerial.write(cmd);
+   midiSerial.write(data1);
+   midiSerial.write(data2);
+   Serial.println(data1);
 }
