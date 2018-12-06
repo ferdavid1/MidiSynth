@@ -36,7 +36,6 @@ int f = 8;
 int g = 10;
 int gsharp = 11;
 
-int modeswitch = 12;
 int oscfreq = 440;
 int bpm = 60;
 int metrodelay = 800;
@@ -56,7 +55,6 @@ pinMode(e, INPUT);
 pinMode(f, INPUT);
 pinMode(g, INPUT);
 pinMode(gsharp, INPUT);
-pinMode(modeswitch, INPUT);
 
 Serial.begin(9600);
 midiSerial.begin(31250);
@@ -80,9 +78,8 @@ void loop() {
  int gsharp_read = digitalRead(gsharp);
  int readlist[9] = {a_read, b_read, c_read, d_read, dsharp_read, e_read, f_read, g_read, gsharp_read};
  int midilist[9] = {33, 35, 24, 26, 27, 28, 29, 31, 32};
- int modeswitchread = digitalRead(modeswitch);
-// int modeswitchread = 1; // testing
- //Serial.println(modeswitchread);
+ int modeswitchread = 1; //hardcode cause switches suck
+// int modeswitchread = 0;
 // Serial.println(dsharp_read);
 // Serial.println(c_read);
  if (modeswitchread == 1) { // Synth Mode
