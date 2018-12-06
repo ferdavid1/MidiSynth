@@ -5,6 +5,7 @@
 #include <tables/sin2048_int8.h> // wavetable holding a sin wave
 #include <SoftwareSerial.h>
 // MIDI OUT wire map
+// yellow is power
 // yellow and light brown: high c -> C
 // yellow and red: low c and high c same time -> D
 // yellow and orange: f# and high c same time -> D#
@@ -17,14 +18,14 @@
 
 // add a 2-way switch for choosing midi keyboard vs synth mode! 
 // Synth BUTTON/SWITCH mode map
-// A -> increase oscillator frequency
-// B -> decrease oscillator frequency
+// G -> increase oscillator frequency
+// A -> decrease oscillator frequency
 // C -> metronome hold 
 // D -> metronome delay increase
 // D#-> metronome delay decrease
 // E -> metronome bpm increase
 // F -> metronome bpm decrease
-// no settings for G or G# in synth mode
+// no settings for B or G# in synth mode
 int a = 2;
 int b = 3;
 int c = 4;
@@ -32,10 +33,10 @@ int d = 5;
 int dsharp = 6;
 int e = 7; 
 int f = 8;
-int g = 9;
-int gsharp = 10;
+int g = 10;
+int gsharp = 11;
 
-int modeswitch = 11;
+int modeswitch = 12;
 int oscfreq = 440;
 int bpm = 60;
 int metrodelay = 800;
@@ -80,12 +81,16 @@ void loop() {
  int readlist[9] = {a_read, b_read, c_read, d_read, dsharp_read, e_read, f_read, g_read, gsharp_read};
  int midilist[9] = {33, 35, 24, 26, 27, 28, 29, 31, 32};
  int modeswitchread = digitalRead(modeswitch);
+// int modeswitchread = 1; // testing
+ //Serial.println(modeswitchread);
+// Serial.println(dsharp_read);
+// Serial.println(c_read);
  if (modeswitchread == 1) { // Synth Mode
-  if (a_read == 1) { // increase oscillator frequency
+  if (g_read == 1) { // increase oscillator frequency
    aSin.setFreq(oscfreq + 100);
    oscfreq = oscfreq + 100;
   }
-  if (b_read == 1) { // decrease oscillator frequency
+  if (a_read == 1) { // decrease oscillator frequency
    aSin.setFreq(oscfreq - 100);
    oscfreq = oscfreq - 100;
   }
